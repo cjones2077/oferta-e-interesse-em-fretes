@@ -9,7 +9,7 @@ import { InputNumber } from "primereact/inputnumber";
 import { Toast } from "primereact/toast";
 
 import ContextoUsuário from "../../contextos/contexto-usuário";
-import { serviçoCadastrarFazendeiro, serviçoBuscarFazendeiro }
+import { serviçoCadastrarFazendeiro, serviçoBuscarFazendeiro, serviçoAtualizarFazendeiro }
     from "../../serviços/serviços-fazendeiro";
 import mostrarToast from "../../utilitários/mostrar-toast";
 import { MostrarMensagemErro, checarListaVazia, validarCamposObrigatórios }
@@ -45,8 +45,19 @@ export default function CadastrarFazendeiro() {
     };
 
     function títuloFormulário() {
-        if (usuárioLogado?.cadastrado) return "Consultar Fazendeiro";
+        if (usuárioLogado?.cadastrado) return "Alterar Fazendeiro";
         else return "Cadastrar Fazendeiro";
+    };
+
+    async function atualizarFazendeiro() {
+        if (validarCampos()) {
+            try {
+                const response = await serviçoAtualizarFazendeiro({ ...dados, cpf: usuárioLogado.cpf });
+                if (response) mostrarToast(referênciaToast, "Fazendeiro atualizado com sucesso!", "sucesso");
+            } catch (error) {
+                mostrarToast(referênciaToast, error.response.data.erro, "erro");
+            }
+        }
     };
 
     async function cadastrarFazendeiro() {
@@ -67,13 +78,14 @@ export default function CadastrarFazendeiro() {
     };
 
     function labelBotãoSalvar() {
-        if (usuárioLogado?.cadastrado) return "Consultar";
+        if (usuárioLogado?.cadastrado) return "Alterar";
         else return "Cadastrar";
     };
 
     function açãoBotãoSalvar() {
-        if (!usuárioLogado?.cadastrado) cadastrarFazendeiro();
-    };
+        if (usuárioLogado?.cadastrado) atualizarFazendeiro();
+        else cadastrarFazendeiro();
+        };
 
     function redirecionar() {
         if (cpfExistente) {

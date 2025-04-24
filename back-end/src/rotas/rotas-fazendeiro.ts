@@ -11,3 +11,5 @@ export default RotasFazendeiro;
 RotasFazendeiro.post("/", ServiçosFazendeiro.cadastrarFazendeiro);
 RotasFazendeiro.get("/:cpf", verificarToken, verificarPerfilFazendeiro,
     ServiçosFazendeiro.buscarFazendeiro);
+RotasFazendeiro.patch("/", verificarToken, verificarPerfilFazendeiro,
+        ServiçosFazendeiro.atualizarFazendeiro);

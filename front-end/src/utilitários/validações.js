@@ -5,6 +5,12 @@ const ERRO_CONFIRMAÇÃO_SENHA = "Senha não confere";
 const ERRO_FORMATO_INVÁLIDO = "Campo com formato inválido";
 const ERRO_QUESTÃO = "Resposta sem questão";
 
+export function validarCpf(cpf) {
+    cpf = cpf.replace(/[^\d]/g, '');
+    if (cpf.length === 11) return true;
+    return false;
+};
+
 export function validarCamposObrigatórios(campos) {
     let errosCamposObrigatórios = {};
     for (let nomeCampo in campos) {

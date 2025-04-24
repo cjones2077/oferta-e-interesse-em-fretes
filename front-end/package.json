@@ -24,7 +24,7 @@
     },
     "eslintConfig": {
     "extends": "react-app",
-    "rules": { "no-console": "warn" }
+    "rules": { "no-console": "off" }
     },
     "browserslist": {
     "production": [

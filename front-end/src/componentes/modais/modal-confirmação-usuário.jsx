@@ -2,13 +2,15 @@ import { useContext, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import mostrarToast from "../../utilitários/mostrar-toast.js";
 import ContextoUsuário from "../../contextos/contexto-usuário";
 import { estilizarBotão, estilizarBotãoRemover, estilizarDivCampo, estilizarInlineFlex,
 estilizarLabel, estilizarModal } from "../../utilitários/estilos";
+import { serviçoAlterarUsuário, serviçoRemoverUsuário } from "../../serviços/serviços-usuário";
 
 export default function ModalConfirmaçãoUsuário() {
     const referênciaToast = useRef(null);
-    const { setUsuárioLogado, confirmaçãoUsuário, setConfirmaçãoUsuário, setMostrarModalConfirmação }
+    const { setUsuárioLogado, confirmaçãoUsuário, setConfirmaçãoUsuário, setMostrarModalConfirmação, usuárioLogado }
         = useContext(ContextoUsuário);
     const dados = { cpf: confirmaçãoUsuário?.cpf, perfil: confirmaçãoUsuário?.perfil,
     nome: confirmaçãoUsuário?.nome, senha: confirmaçãoUsuário?.senha,
@@ -17,9 +19,29 @@ export default function ModalConfirmaçãoUsuário() {
     const [redirecionar] = useState(false);
     const navegar = useNavigate();
 
+    async function alterarUsuário(dadosAlterados) {
+        try {
+            const response = await serviçoAlterarUsuário({ ...dadosAlterados, cpf: usuárioLogado.cpf });
+            setUsuárioLogado({...usuárioLogado, ...response.data });
+            setRedirecionar(true);
+            mostrarToast(referênciaToast, "Alterado com sucesso! Redirecionando à Página Inicial...",
+                "sucesso");
+        } catch (error) { mostrarToast(referênciaToast, error.response.data.erro, "erro"); }
+    };
+
+    async function removerUsuário() {
+        try {
+            await serviçoRemoverUsuário(usuárioLogado.cpf);
+            setRedirecionar(true);
+            mostrarToast(referênciaToast, "Removido com sucesso! Redirecionando ao Login.", "sucesso");
+        } catch (error) { mostrarToast(referênciaToast, error.response.data.erro, "erro"); }
+    };
+
     function labelOperação() {
         switch (confirmaçãoUsuário?.operação) {
             case "salvar": return "Salvar";
+            case "alterar": return "Alterar";
+            case "remover": return "Remover";
             default: return;
         }
     };
@@ -27,6 +49,7 @@ export default function ModalConfirmaçãoUsuário() {
     function exibirPerfilFormatado() {
         switch (dados.perfil) {
             case "fazendeiro": return "Fazendeiro";
+            case "transportador": return "Transportador";
             default: return "";
         }
     };
@@ -45,6 +68,10 @@ export default function ModalConfirmaçãoUsuário() {
             setUsuárioLogado({ ...dados, cadastrado: false });
             setMostrarModalConfirmação(false);
             navegar("../cadastrar-fazendeiro");
+        } else if (dados.perfil === "transportador") {
+            setUsuárioLogado({ ...dados, cadastrado: false });
+            setMostrarModalConfirmação(false);
+            navegar("../cadastrar-transportador");
         }
     };
 
@@ -52,6 +79,13 @@ export default function ModalConfirmaçãoUsuário() {
         switch (confirmaçãoUsuário.operação) {
             case "salvar":
                 finalizarCadastro();
+                break;
+            case "alterar":
+                alterarUsuário({ email: dados.email, senha: dados.senha, questão: dados.questão,
+                    resposta: dados.resposta, cor_tema: dados.cor_tema });
+                break;
+            case "remover":
+                removerUsuário();
                 break;
             default: break;
         }

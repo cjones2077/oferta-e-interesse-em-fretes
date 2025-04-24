@@ -11,8 +11,12 @@ export const opçõesCores = [
     { label: "Verde Azulado", value: "teal" }
 ];
 
-export const TAMANHOS = { CPF: 13, SENHA: 15 };
+export const TAMANHOS = { N_EIXOS: 4, CPF: 13, SENHA: 15, TELEFONE: 12};
 export const TEMA_PADRÃO = "bluegray";
+
+export function estilizarParágrafo() {
+    return "text-justify text-lg md:text-sm align-self-start text-gray-900";
+};
 
 export function estilizarBotão() {
     const cor_botão = "green";

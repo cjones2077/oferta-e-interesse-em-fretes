@@ -28,7 +28,15 @@ export default function MenuLateral({ children }) {
         ]},
     ];
 
-    const opçõesTransportador = [];
+    const opçõesTransportador = [
+        { label: "Página Inicial", command: () => navegar("/pagina-inicial") },
+        { label: "Menu", items: [
+            { label: "Cadastrar Usuário", command: () => navegar("/atualizar-usuario"),
+                disabled: usuárioLogado.status !== "ativo"},
+            { label: "Cadastrar Transportador", command: () => navegar("/cadastrar-transportador")},
+            { label: "Sair do Sistema", command: () => sairSistema()},
+        ]},
+    ];
 
     function sairSistema() {
         setUsuárioLogado({});

@@ -18,7 +18,7 @@ export default function PáginaInicial() {
     return (
     <div className={estilizarPáginaÚnica()}>
         <Card header={HeaderCentralizado} className={estilizarCard(usuárioLogado.cor_tema)}>
-            <Image src={caminhão} alt="Venha fazer a diferença!" width={1100} />
+            <Image src={caminhão} alt="" width={1100} />
         </Card>
     </div>
     );

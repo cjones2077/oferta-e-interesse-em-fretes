@@ -7,6 +7,16 @@ import ServiçosUsuário from "./serviços-usuário";
 export default class ServiçosFazendeiro {
     constructor() {}
 
+    static async atualizarFazendeiro(request, response) {
+        try {
+            const { cpf, tipo_produção, tamanho_propriedade } = request.body;
+            const cpf_encriptado = md5(cpf);
+            await Fazendeiro.update({ usuário: { cpf: cpf_encriptado } },
+                { tipo_produção, tamanho_propriedade });
+            return response.json();
+        } catch (error) { return response.status(500).json({ erro: "Erro BD : atualizarFazendeiro" }); }
+    };
+
     static async cadastrarFazendeiro(request, response) {
         try {
             const { usuário_info, tamanho_propriedade, tipo_produção } = request.body;

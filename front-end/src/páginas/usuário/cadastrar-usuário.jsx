@@ -16,7 +16,7 @@ import { CPF_MÁSCARA } from "../../utilitários/máscaras";
 import { MostrarMensagemErro, checarListaVazia, validarCampoEmail, validarCamposObrigatórios,
     validarConfirmaçãoSenha, validarConfirmaçãoSenhaOpcional, validarRecuperaçãoAcessoOpcional }
     from "../../utilitários/validações";
-import { TAMANHOS, TEMA_PADRÃO, estilizarBotão, estilizarCard, estilizarDialog,
+import { TAMANHOS, TEMA_PADRÃO, estilizarBotão, estilizarBotãoRemover, estilizarCard, estilizarDialog,
     estilizarDivBotõesAção, estilizarDivCampo, estilizarDivider, estilizarDropdown, estilizarFlex,
     estilizarFooterDialog, estilizarInputMask, estilizarInputText, estilizarLabel, estilizarLink,
     estilizarPasswordInput, estilizarPasswordTextInputBorder, estilizarSubtítulo, opçõesCores }
@@ -39,11 +39,13 @@ export default function CadastrarUsuário() {
     function alterarEstado(event) {
         const chave = event.target.name;
         const valor = event.target.value;
+        console.log(`alterarEstado: Atualizando ${chave} com valor ${valor}`);
         setDados({ ...dados, [chave]: valor });
     };
 
     function validarCamposAdministrar() {
         const { email, senha, confirmação, questão, resposta } = dados;
+        console.log("validarCamposAdministrar: Dados - ", dados);
         let errosCamposObrigatórios = validarCamposObrigatórios({ email });
         let errosValidaçãoEmail = validarCampoEmail(email);
         let errosConfirmaçãoSenhaOpcional = validarConfirmaçãoSenhaOpcional(senha, confirmação);
@@ -57,7 +59,7 @@ export default function CadastrarUsuário() {
 
     function validarCamposCadastrar() {
         const { perfil, cpf, nome, questão, resposta, senha, confirmação, email } = dados;
-        console.log("CadastrarUsuário.validarCamposCadastrar:dados.nome -- " + dados.nome);
+        console.log("CadastrarUsuário.validarCamposCadastrar: dados.nome -- " + dados.nome);
         console.log(JSON.parse(JSON.stringify(dados)));
         if (!usuárioLogado?.perfil) {
             let errosCamposObrigatórios = validarCamposObrigatórios
@@ -77,7 +79,7 @@ export default function CadastrarUsuário() {
 
     function títuloFormulário() {
         if (!usuárioLogado?.perfil) return "Cadastrar Usuário";
-        else return "Consultar Usuário";
+        else return "Alterar Usuário";
     };
 
     function textoRetorno() {
@@ -91,41 +93,71 @@ export default function CadastrarUsuário() {
     };
 
     function limparOcultar() {
+        console.log("limparOcultar: Fechando modal de confirmação.");
         setConfirmaçãoUsuário(null);
         setMostrarModalConfirmação(false);
     };
+
+    function validarConfirmarAlteração() {
+        console.log("validarConfirmarAlteração: Iniciando validação para alteração.");
+        const camposVálidos = validarCampos();
+        if (camposVálidos) confirmarOperação("alterar");
+    };
+
     async function validarConfirmarCriação() {
+        console.log("validarConfirmarCriação: Iniciando validação para criação.");
         const camposVálidos = validarCampos();
         if (camposVálidos) {
             let response;
             try {
+                console.log(`validarConfirmarCriação: Verificando CPF ${dados.cpf}`);
                 response = await serviçoVerificarCpfExistente(dados.cpf);
                 if (response) confirmarOperação("salvar");
             } catch (error) {
-            if (error.response.data.erro)
-                mostrarToast(referênciaToast, error.response.data.erro, "erro");
+                console.log("validarConfirmarCriação: Erro ao verificar CPF", error);
+                if (error.response.data.erro)
+                    mostrarToast(referênciaToast, error.response.data.erro, "erro");
             }
         }
     }
 
     function confirmarOperação(operação) {
+        console.log(`confirmarOperação: Confirmando operação de ${operação}.`);
         setConfirmaçãoUsuário({ ...dados, operação });
         setMostrarModalConfirmação(true);
     };
 
     function ComandosConfirmação() {
         if (!usuárioLogado?.perfil) {
-            return <Button className={estilizarBotão(dados.cor_tema)} label="Salvar"
-                onClick={validarConfirmarCriação}/>;
+            return (
+                <Button
+                    className={estilizarBotão(dados.cor_tema)}
+                    label="Salvar"
+                    onClick={validarConfirmarCriação}
+                />
+            );
         } else {
             return (
                 <div className={estilizarDivBotõesAção()}>
+                    <Button
+                        className={estilizarBotão(dados.cor_tema)}
+                        label="Alterar"
+                        onClick={() => validarConfirmarAlteração()}
+                    />
+                    <Button
+                        className={estilizarBotãoRemover(dados.cor_tema)}
+                        label="Remover"
+                        onClick={() => confirmarOperação("remover")}
+                    />
                 </div>
             );
         }
+    }
+
+    function alinharCentro() { 
+        if (!usuárioLogado?.cadastrado) return "center"; 
     };
-    
-    function alinharCentro() { if (!usuárioLogado?.cadastrado) return "center"; };
+
     return (
         <div className={estilizarFlex(alinharCentro())}>
             <Toast ref={referênciaToast} position="bottom-center" />
@@ -214,5 +246,5 @@ export default function CadastrarUsuário() {
                 </div>
             </Card>
         </div>
-        );
-    }
+    );
+}
