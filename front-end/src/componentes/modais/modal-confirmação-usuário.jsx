@@ -16,7 +16,7 @@ export default function ModalConfirmaçãoUsuário() {
     nome: confirmaçãoUsuário?.nome, senha: confirmaçãoUsuário?.senha,
     email: confirmaçãoUsuário?.email, questão: confirmaçãoUsuário?.questão,
     resposta: confirmaçãoUsuário?.resposta, cor_tema: confirmaçãoUsuário?.cor_tema };
-    const [redirecionar] = useState(false);
+    const [redirecionar, setRedirecionar] = useState(false);
     const navegar = useNavigate();
 
     async function alterarUsuário(dadosAlterados) {
